@@ -1,0 +1,44 @@
+/* Custom CSS for Mega Menu & Right Chevron */
+/* Hide Bootstrap's default dropdown caret */
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Style the mega menu container */
+.mega-menu .dropdown-menu.mega-menu-content {
+  width: 100%;                /* full width relative to parent */
+  max-width: 1200px;         /* optional: limit max width */
+  padding: 1.5rem 1rem;
+  margin-top: 0.5rem;
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+/* Responsive: ensure columns stack on mobile */
+@media (max-width: 767.98px) {
+  .mega-menu .dropdown-menu.mega-menu-content {
+    width: 100%;
+    min-width: 100%;
+  }
+  .mega-menu .dropdown-menu.mega-menu-content .col-md-4 {
+    margin-bottom: 0.75rem;
+  }
+  .mega-menu .dropdown-menu.mega-menu-content .col-md-4:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Optional: improve link spacing inside mega menu */
+.mega-menu .dropdown-item {
+  padding: 0.5rem 1rem;
+  white-space: normal;        /* allows text to wrap */
+  word-break: break-word;
+}
+
+/* Chevron icon alignment */
+.dropdown-toggle .bi-chevron-down {
+  transition: transform 0.2s ease;
+}
+.dropdown-toggle.show .bi-chevron-down {
+  transform: rotate(180deg);  /* rotate when menu is open */
+}
