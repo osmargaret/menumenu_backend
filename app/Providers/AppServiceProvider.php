@@ -24,6 +24,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        // Push IP-to-state middleware into the web group so we can detect user state by IP
+        if ($this->app->runningInConsole() === false) {
+            $router = $this->app->make(\Illuminate\Routing\Router::class);
+            $router->pushMiddlewareToGroup('web', \App\Http\Middleware\DetectStateByIp::class);
+        }
     }
 
     /**

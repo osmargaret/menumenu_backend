@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+class Vendor extends Authenticatable
+{
+    use HasFactory, HasApiTokens, Notifiable;
+
+    protected $fillable = [
+        'user_id', 'name', 'slug', 'email', 'phone', 'password', 'tagline', 'description',
+        'banner_path', 'avatar_path', 'address', 'city', 'state_id', 'city_id', 'is_open', 'open_time', 'close_time',
+        'delivery_available', 'pickup_available', 'commission_percent',
+    ];
+
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function cityModel()
+    {
+        return $this->belongsTo(City::class, 'city_id');
+    }
+
+    public function scopeInState($query, $stateId)
+    {
+        if (! $stateId) {
+            return $query;
+        }
+        return $query->where('state_id', $stateId);
+    }
+
+    public function areas()
+    {
+        return $this->hasMany(VendorArea::class);
+    }
+
+    public function meals()
+    {
+        return $this->hasMany(Meal::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function team()
+    {
+        return $this->hasMany(TeamMember::class);
+    }
+
+    public function blogPosts()
+    {
+        return $this->hasMany(BlogPost::class);
+    }
+}
