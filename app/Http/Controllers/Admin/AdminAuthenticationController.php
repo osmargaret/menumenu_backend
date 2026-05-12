@@ -55,4 +55,16 @@ class AdminAuthenticationController extends Controller
             'data' => $request->user(),
         ]);
     }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'If an admin account with that email exists, a password reset link has been sent.',
+        ]);
+    }
 }

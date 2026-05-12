@@ -24,7 +24,9 @@ Route::get('welcome', function(){
 
 Route::post('customer-login', [CustomersAuthenticationController::class,'login']);
 Route::post('customer-register', [CustomersAuthenticationController::class,'register']);
+Route::post('forgot-password', [CustomersAuthenticationController::class,'forgotPassword']);
 Route::post('admin-login', [AdminAuthenticationController::class, 'login']);
+Route::post('admin-forgot-password', [AdminAuthenticationController::class, 'forgotPassword']);
 
 Route::middleware(['auth:sanctum', 'admin.auth'])->prefix('admin')->group(function () {
     Route::get('profile', [AdminAuthenticationController::class, 'profile']);

@@ -51,4 +51,15 @@ class CustomersAuthenticationController extends Controller
             'token' => $token,
         ]);
     }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        return response()->json([
+            'message' => 'If an account with that email exists, a password reset link has been sent.',
+        ]);
+    }
 }
