@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Customers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Models\State;
+use Illuminate\Support\Facades\Hash;
 
 class CustomersAuthenticationController extends Controller
 {
@@ -16,18 +18,25 @@ class CustomersAuthenticationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'state_id' => 'nullable|integer|exists:states,id',
         ]);
+
+        $stateId = $data['state_id'] ?? session('state_id') ?? State::first()?->id ?? 1;
 
         $user = \App\Models\User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'password' => Hash::make($data['password']),
+            'state_id' => $stateId,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $userData = $user->toArray();
+        $userData['role'] = 'customer';
+
         return response()->json([
-            'user' => $user,
+            'user' => $userData,
             'token' => $token,
         ], 201);
     }
@@ -46,8 +55,11 @@ class CustomersAuthenticationController extends Controller
         $user = \App\Models\User::where('email', $request->email)->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $userData = $user->toArray();
+        $userData['role'] = 'customer';
+
         return response()->json([
-            'user' => $user,
+            'user' => $userData,
             'token' => $token,
         ]);
     }
