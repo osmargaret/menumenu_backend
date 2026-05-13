@@ -21,10 +21,18 @@ class CustomersAuthenticationController extends Controller
             'state_id' => 'nullable|integer',
         ]);
 
+        // Auto-seed if the table is empty (handles ephemeral Railway disks)
+        if (\App\Models\State::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'NigeriaStatesCitiesSeeder',
+                '--force' => true
+            ]);
+        }
+
         // Resilient state_id selection:
         // 1. Check if the provided state_id exists
         // 2. If not, try the first available state in the DB
-        // 3. If the DB is empty (rare), we fallback to 1 (but we should prevent this)
+        // 3. If the DB is empty (rare), we fallback to 1
         $stateId = $data['state_id'];
         $exists = \App\Models\State::where('id', $stateId)->exists();
         

@@ -24,15 +24,6 @@ Route::get('welcome', function(){
     return 'Hello World';
 });
 
-Route::get('debug-states', function() {
-    return response()->json([
-        'count' => \App\Models\State::count(),
-        'first_five' => \App\Models\State::limit(5)->get(),
-        'db_connection' => config('database.default'),
-        'db_database' => config('database.connections.' . config('database.default') . '.database'),
-    ]);
-});
-
 Route::post('customer-login', [CustomersAuthenticationController::class,'login']);
 Route::post('customer-register', [CustomersAuthenticationController::class,'register']);
 Route::post('forgot-password', [CustomersAuthenticationController::class,'forgotPassword']);
