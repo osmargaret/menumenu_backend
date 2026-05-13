@@ -24,6 +24,18 @@ Route::get('welcome', function(){
     return 'Hello World';
 });
 
+Route::get('seed-states', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => 'NigeriaStatesCitiesSeeder',
+            '--force' => true
+        ]);
+        return response()->json(['message' => 'States seeded successfully!', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+
 Route::post('customer-login', [CustomersAuthenticationController::class,'login']);
 Route::post('customer-register', [CustomersAuthenticationController::class,'register']);
 Route::post('forgot-password', [CustomersAuthenticationController::class,'forgotPassword']);
