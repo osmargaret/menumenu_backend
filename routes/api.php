@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\MealController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Admin\AdminAuthenticationController;
 
+use App\Http\Controllers\Vendor\VendorAuthenticationController;
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -27,6 +29,8 @@ Route::post('customer-register', [CustomersAuthenticationController::class,'regi
 Route::post('forgot-password', [CustomersAuthenticationController::class,'forgotPassword']);
 Route::post('admin-login', [AdminAuthenticationController::class, 'login']);
 Route::post('admin-forgot-password', [AdminAuthenticationController::class, 'forgotPassword']);
+Route::post('vendor-login', [VendorAuthenticationController::class, 'login']);
+Route::post('vendor-register', [VendorAuthenticationController::class, 'register']);
 
 Route::middleware(['auth:sanctum', 'admin.auth'])->prefix('admin')->group(function () {
     Route::get('profile', [AdminAuthenticationController::class, 'profile']);
@@ -43,6 +47,7 @@ Route::middleware(['auth:sanctum', 'admin.auth'])->prefix('admin')->group(functi
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('vendor/profile', [VendorAuthenticationController::class, 'profile']);
     Route::apiResource('vendors', VendorController::class);
     Route::apiResource('meals', MealController::class);
     Route::apiResource('orders', OrderController::class);

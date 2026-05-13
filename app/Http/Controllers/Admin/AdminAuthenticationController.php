@@ -22,11 +22,14 @@ class AdminAuthenticationController extends Controller
         if ($admin && Hash::check($request->password, $admin->password)) {
             $token = $admin->createToken('admin-token')->plainTextToken;
 
+            $adminData = $admin->toArray();
+            $adminData['role'] = 'admin'; // Or super_admin if there's a specific check
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Admin logged in successfully',
                 'data' => [
-                    'user' => $admin,
+                    'user' => $adminData,
                     'token' => $token,
                 ]
             ]);
