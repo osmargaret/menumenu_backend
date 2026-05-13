@@ -38,6 +38,8 @@ class VendorAuthenticationController extends Controller
             'state_id' => $stateId,
         ]);
 
+        $vendor->sendEmailVerificationNotification();
+
         $token = $vendor->createToken('vendor_token')->plainTextToken;
         
         $vendorData = $vendor->toArray();

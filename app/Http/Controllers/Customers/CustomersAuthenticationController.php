@@ -47,6 +47,9 @@ class CustomersAuthenticationController extends Controller
             'state_id' => $stateId,
         ]);
 
+        // Trigger email verification
+        $user->sendEmailVerificationNotification();
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $userData = $user->toArray();

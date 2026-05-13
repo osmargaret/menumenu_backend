@@ -24,6 +24,15 @@ Route::get('welcome', function(){
     return 'Hello World';
 });
 
+Route::get('verify-me/{email}', function($email) {
+    $user = \App\Models\User::where('email', $email)->first() ?? \App\Models\Vendor::where('email', $email)->first();
+    
+    if (!$user) return response()->json(['error' => 'User not found'], 404);
+    
+    $user->markEmailAsVerified();
+    return response()->json(['message' => "Account $email is now verified!"]);
+});
+
 Route::post('customer-login', [CustomersAuthenticationController::class,'login']);
 Route::post('customer-register', [CustomersAuthenticationController::class,'register']);
 Route::post('forgot-password', [CustomersAuthenticationController::class,'forgotPassword']);
