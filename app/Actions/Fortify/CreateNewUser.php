@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Models\State;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -19,12 +20,17 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', PasswordRule::min(8)],
+            'state_id' => ['nullable', 'integer', 'exists:states,id'],
         ])->validate();
+
+        // Determine state_id: prefer provided input, then session, then first state fallback
+        $stateId = $input['state_id'] ?? session('state_id') ?? State::first()?->id ?? 1;
 
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'state_id' => $stateId,
         ]);
     }
 }
