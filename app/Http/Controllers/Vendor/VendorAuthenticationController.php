@@ -13,13 +13,29 @@ class VendorAuthenticationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:vendors',
             'password' => 'required|string|min:8',
+            'state_id' => 'nullable|integer',
         ]);
+
+        // Auto-seed if the table is empty (handles ephemeral Railway disks)
+        if (\App\Models\State::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'NigeriaStatesCitiesSeeder',
+                '--force' => true
+            ]);
+        }
+
+        // Resilient state_id selection:
+        $stateId = $data['state_id'] ?? 1;
+        if (!\App\Models\State::where('id', $stateId)->exists()) {
+            $stateId = \App\Models\State::first()?->id ?? 1;
+        }
 
         $vendor = \App\Models\Vendor::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
             'slug' => \Illuminate\Support\Str::slug($data['name']) . '-' . uniqid(),
+            'state_id' => $stateId,
         ]);
 
         $token = $vendor->createToken('vendor_token')->plainTextToken;
