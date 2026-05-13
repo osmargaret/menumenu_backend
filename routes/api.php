@@ -24,6 +24,14 @@ Route::get('welcome', function(){
     return 'Hello World';
 });
 
+Route::get('clear-cache', function() {
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    return response()->json(['message' => 'All caches cleared successfully!']);
+});
+
 Route::get('verify-me/{email}', function($email) {
     $user = \App\Models\User::where('email', $email)->first() ?? \App\Models\Vendor::where('email', $email)->first();
     
