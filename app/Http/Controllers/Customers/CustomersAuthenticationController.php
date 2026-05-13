@@ -18,10 +18,17 @@ class CustomersAuthenticationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'state_id' => 'nullable|integer|exists:states,id',
+            'state_id' => 'nullable|integer',
         ]);
 
-        $stateId = $data['state_id'] ?? session('state_id') ?? State::first()?->id ?? 1;
+        // Resilient state_id selection:
+        // 1. Check if the provided state_id exists
+        // 2. If not, try the first state in the DB
+        // 3. If no states exist at all, we fallback to ID 1 (but this might fail DB constraints if not seeded)
+        $stateId = $data['state_id'] ?? 1;
+        if (!State::where('id', $stateId)->exists()) {
+            $stateId = State::first()?->id ?? 1;
+        }
 
         $user = \App\Models\User::create([
             'name' => $data['name'],
