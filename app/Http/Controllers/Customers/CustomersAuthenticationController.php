@@ -23,11 +23,13 @@ class CustomersAuthenticationController extends Controller
 
         // Resilient state_id selection:
         // 1. Check if the provided state_id exists
-        // 2. If not, try the first state in the DB
-        // 3. If no states exist at all, we fallback to ID 1 (but this might fail DB constraints if not seeded)
-        $stateId = $data['state_id'] ?? 1;
-        if (!State::where('id', $stateId)->exists()) {
-            $stateId = State::first()?->id ?? 1;
+        // 2. If not, try the first available state in the DB
+        // 3. If the DB is empty (rare), we fallback to 1 (but we should prevent this)
+        $stateId = $data['state_id'];
+        $exists = \App\Models\State::where('id', $stateId)->exists();
+        
+        if (!$exists) {
+            $stateId = \App\Models\State::first()?->id ?? 1;
         }
 
         $user = \App\Models\User::create([
