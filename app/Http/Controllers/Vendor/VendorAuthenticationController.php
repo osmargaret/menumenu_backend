@@ -4,16 +4,22 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
+use App\Notifications\OtpCodeNotification;
+use App\Models\Vendor;
 
 class VendorAuthenticationController extends Controller
 {
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:vendors',
-            'password' => 'required|string|min:8',
-            'state_id' => 'nullable|integer',
+            'name'     => 'required|string|min:2|max:255|unique:vendors,name',
+            'email'    => 'required|string|email:rfc|max:255|unique:vendors,email',
+            'password' => 'required|string|min:8|confirmed',
+            'phone'    => 'nullable|string|max:20',
+            'state_id' => 'nullable|exists:states,id',
+            'city_id'  => 'nullable|exists:cities,id',
         ]);
 
         // Auto-seed if the table is empty (handles ephemeral Railway disks)
@@ -24,29 +30,31 @@ class VendorAuthenticationController extends Controller
             ]);
         }
 
-        // Resilient state_id selection:
-        $stateId = $data['state_id'] ?? 1;
-        if (!\App\Models\State::where('id', $stateId)->exists()) {
-            $stateId = \App\Models\State::first()?->id ?? 1;
-        }
+        $stateId = $data['state_id'] ?? \App\Models\State::first()?->id ?? 1;
 
         $vendor = \App\Models\Vendor::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name'     => $data['name'],
+            'email'    => $data['email'],
             'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
-            'slug' => \Illuminate\Support\Str::slug($data['name']) . '-' . uniqid(),
+            'slug'     => \Illuminate\Support\Str::slug($data['name']) . '-' . uniqid(),
+            'phone'    => $data['phone'] ?? null,
             'state_id' => $stateId,
+            'city_id'  => $data['city_id'] ?? null,
         ]);
 
-        $vendor->sendEmailVerificationNotification();
+        // Generate and send OTP
+        $otp = rand(100000, 999999);
+        $hashedOtp = Hash::make($otp);
+        Cache::put('otp_'.$vendor->id, $hashedOtp, now()->addMinutes(10));
+        $vendor->notify(new OtpCodeNotification($otp));
 
         $token = $vendor->createToken('vendor_token')->plainTextToken;
-        
-        $vendorData = $vendor->toArray();
+
+        $vendorData = $vendor->load('state', 'city')->toArray();
         $vendorData['role'] = 'vendor';
 
         return response()->json([
-            'user' => $vendorData,
+            'user'  => $vendorData,
             'token' => $token,
         ], 201);
     }
@@ -65,12 +73,12 @@ class VendorAuthenticationController extends Controller
         }
 
         $token = $vendor->createToken('vendor_token')->plainTextToken;
-        
-        $vendorData = $vendor->toArray();
+
+        $vendorData = $vendor->load('state', 'city')->toArray();
         $vendorData['role'] = 'vendor';
 
         return response()->json([
-            'user' => $vendorData,
+            'user'  => $vendorData,
             'token' => $token,
         ]);
     }
@@ -96,12 +104,12 @@ class VendorAuthenticationController extends Controller
 
         $vendor->update($data);
 
-        $vendorData = $vendor->fresh()->toArray();
+        $vendorData = $vendor->fresh()->load('state', 'city')->toArray();
         $vendorData['role'] = 'vendor';
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user' => $vendorData
+            'user'    => $vendorData,
         ]);
     }
 }

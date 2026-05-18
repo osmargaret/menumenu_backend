@@ -13,7 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'admin.auth' => \App\Http\Middleware\EnsureIsAdmin::class,
+            'admin.auth'      => \App\Http\Middleware\EnsureIsAdmin::class,
+            'customer.auth'   => \App\Http\Middleware\CustomerMiddleware::class,
+            'vendor.auth'     => \App\Http\Middleware\VendorMiddleware::class,
+            'detect.location' => \App\Http\Middleware\DetectStateByIp::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

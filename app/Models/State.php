@@ -9,7 +9,12 @@ class State extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','slug'];
+    protected $fillable = ['country_id', 'name', 'slug'];
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 
     public function cities()
     {

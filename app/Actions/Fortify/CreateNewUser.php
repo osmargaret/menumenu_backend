@@ -4,9 +4,11 @@ namespace App\Actions\Fortify;
 
 use App\Models\User;
 use App\Models\State;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password as PasswordRule;
+use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
@@ -24,7 +26,21 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         // Determine state_id: prefer provided input, then session, then first state fallback
-        $stateId = $input['state_id'] ?? session('state_id') ?? State::first()?->id ?? 1;
+        $stateId = $input['state_id'] ?? session('state_id');
+
+        if (empty($stateId)) {
+            if (State::count() === 0) {
+                // Create a default state if none exists using query builder to avoid model issues
+                $stateId = DB::table('states')->insertGetId([
+                    'name' => 'Default State',
+                    'slug' => Str::slug('Default State'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                $stateId = State::first()?->id ?? 1;
+            }
+        }
 
         return User::create([
             'name' => $input['name'],

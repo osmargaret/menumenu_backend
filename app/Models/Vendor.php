@@ -14,7 +14,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
 
     protected $fillable = [
         'user_id', 'name', 'slug', 'email', 'phone', 'password', 'tagline', 'description',
-        'banner_path', 'avatar_path', 'address', 'city', 'state_id', 'city_id', 'is_open', 'open_time', 'close_time',
+        'banner_path', 'avatar_path', 'address', 'state_id', 'city_id', 'is_open', 'open_time', 'close_time',
         'delivery_available', 'pickup_available', 'commission_percent',
     ];
 
@@ -36,7 +36,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(State::class);
     }
 
-    public function cityModel()
+    public function city()
     {
         return $this->belongsTo(City::class, 'city_id');
     }
@@ -59,6 +59,16 @@ class Vendor extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Meal::class);
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(\App\Models\Category::class, 'category_vendor');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);
@@ -66,7 +76,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
 
     public function team()
     {
-        return $this->hasMany(TeamMember::class);
+        return $this->hasMany(VendorMember::class);
     }
 
     public function blogPosts()
