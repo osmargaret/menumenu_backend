@@ -46,7 +46,7 @@ Route::get('welcome', fn () => response()->json(['status' => 'ok', 'app' => 'Fea
 |--------------------------------------------------------------------------
 */
 Route::get('states',[LocationController::class, 'states']);   // list all 37 states
-Route::get('cities', [LocationController::class, 'cities']);   // cities for a state
+Route::get('states/{state}/cities', [LocationController::class, 'cities']);   // cities for a state
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +74,7 @@ Route::get('meals/{meal}',               [MealController::class, 'show']);
 |--------------------------------------------------------------------------
 */
 Route::post('customer-register', [CustomersAuthenticationController::class, 'register']);
+Route::post('hi/customer-register', [CustomersAuthenticationController::class, 'register']); // For backward compatibility
 Route::post('customer-login',    [CustomersAuthenticationController::class, 'login']);
 Route::post('forgot-password',   [CustomersAuthenticationController::class, 'forgotPassword']);
 Route::post('verify-otp',        [OtpController::class, 'verify']);
