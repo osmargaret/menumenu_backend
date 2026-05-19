@@ -19,6 +19,13 @@ class CustomersAuthenticationController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     public function register(Request $request)
     {
+        // Auto-run migrations if database is fresh (handles ephemeral Railway SQLite)
+        if (!\Illuminate\Support\Facades\Schema::hasTable('states')) {
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--force' => true,
+            ]);
+        }
+
         // Auto-seed states if the table is empty (handles ephemeral Railway disks)
         if (State::count() === 0) {
             \Illuminate\Support\Facades\Artisan::call('db:seed', [
