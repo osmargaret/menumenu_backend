@@ -73,7 +73,7 @@ class CustomersAuthenticationController extends Controller
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
-            'password' => $data['password'],   // 'hashed' cast on the model handles bcrypt
+            'password' => Hash::make($data['password']),
             'phone'    => $data['phone'] ?? null,
             'state_id' => $stateId,
         ]);

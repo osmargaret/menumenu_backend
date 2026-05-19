@@ -23,7 +23,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
     ];
 
     protected $casts = [
-        'password' => 'hashed',
+        //
     ];
 
     public function owner()
