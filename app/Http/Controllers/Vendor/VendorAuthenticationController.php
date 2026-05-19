@@ -13,20 +13,24 @@ class VendorAuthenticationController extends Controller
 {
     public function register(Request $request)
     {
-        // Auto-run migrations if database is fresh (handles ephemeral Railway SQLite)
+        // Auto-run migrations if states table doesn't exist yet
         if (!\Illuminate\Support\Facades\Schema::hasTable('states')) {
-            \Illuminate\Support\Facades\Artisan::call('migrate', [
-                '--force' => true,
-            ]);
+            try {
+                \Illuminate\Support\Facades\Artisan::call('migrate', [
+                    '--force' => true,
+                ]);
+            } catch (\Throwable $e) {}
         }
 
-        // Auto-seed if the table is empty (handles ephemeral Railway disks)
-        if (\App\Models\State::count() === 0) {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                '--class' => 'NigeriaStatesCitiesSeeder',
-                '--force' => true
-            ]);
-        }
+        // Auto-seed states if the table is empty (handles ephemeral Railway disks)
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('states') && \App\Models\State::count() === 0) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'NigeriaStatesCitiesSeeder',
+                    '--force' => true,
+                ]);
+            }
+        } catch (\Throwable $e) {}
 
         $data = $request->validate([
             'name'     => 'required|string|min:2|max:255|unique:vendors,name',

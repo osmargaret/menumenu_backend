@@ -19,20 +19,24 @@ class CustomersAuthenticationController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     public function register(Request $request)
     {
-        // Auto-run migrations if database is fresh (handles ephemeral Railway SQLite)
+        // Auto-run migrations if states table doesn't exist yet
         if (!\Illuminate\Support\Facades\Schema::hasTable('states')) {
-            \Illuminate\Support\Facades\Artisan::call('migrate', [
-                '--force' => true,
-            ]);
+            try {
+                \Illuminate\Support\Facades\Artisan::call('migrate', [
+                    '--force' => true,
+                ]);
+            } catch (\Throwable $e) {}
         }
 
         // Auto-seed states if the table is empty (handles ephemeral Railway disks)
-        if (State::count() === 0) {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                '--class' => 'NigeriaStatesCitiesSeeder',
-                '--force' => true,
-            ]);
-        }
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('states') && State::count() === 0) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'NigeriaStatesCitiesSeeder',
+                    '--force' => true,
+                ]);
+            }
+        } catch (\Throwable $e) {}
 
         $data = $request->validate([
             // Personal info

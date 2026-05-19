@@ -18,23 +18,27 @@ class LocationController extends Controller
     */
     public function states()
     {
-        // Auto-run migrations if database is fresh (handles ephemeral Railway SQLite)
+        // Auto-run migrations if states table doesn't exist yet
         if (!\Illuminate\Support\Facades\Schema::hasTable('states')) {
-            \Illuminate\Support\Facades\Artisan::call('migrate', [
-                '--force' => true,
-            ]);
+            try {
+                \Illuminate\Support\Facades\Artisan::call('migrate', [
+                    '--force' => true,
+                ]);
+            } catch (\Throwable $e) {}
         }
 
         // Auto-seed states if the table is empty (handles ephemeral Railway disks)
-        if (State::count() === 0) {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                '--class' => 'NigeriaStatesCitiesSeeder',
-                '--force' => true,
-            ]);
-        }
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('states') && State::count() === 0) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'NigeriaStatesCitiesSeeder',
+                    '--force' => true,
+                ]);
+            }
+        } catch (\Throwable $e) {}
 
-        $states = State::all();
-        return response()->json($states,200);
+        $states = \Illuminate\Support\Facades\Schema::hasTable('states') ? State::all() : collect();
+        return response()->json($states, 200);
     }
 
     /*

@@ -10,20 +10,26 @@ class NigeriaStatesCitiesSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure the countries table has Nigeria; seed it inline if missing
-        $nigeria = DB::table('countries')->where('code', 'NG')->first();
-        if (!$nigeria) {
-            $nigeriaId = DB::table('countries')->insertGetId([
-                'name'       => 'Nigeria',
-                'code'       => 'NG',
-                'phone_code' => '+234',
-                'flag'       => '🇳🇬',
-                'is_active'  => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        } else {
-            $nigeriaId = $nigeria->id;
+        $hasCountriesTable = \Illuminate\Support\Facades\Schema::hasTable('countries');
+        $hasCountryIdColumn = \Illuminate\Support\Facades\Schema::hasColumn('states', 'country_id');
+
+        $nigeriaId = null;
+        if ($hasCountriesTable) {
+            // Ensure the countries table has Nigeria; seed it inline if missing
+            $nigeria = DB::table('countries')->where('code', 'NG')->first();
+            if (!$nigeria) {
+                $nigeriaId = DB::table('countries')->insertGetId([
+                    'name'       => 'Nigeria',
+                    'code'       => 'NG',
+                    'phone_code' => '+234',
+                    'flag'       => '🇳🇬',
+                    'is_active'  => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                $nigeriaId = $nigeria->id;
+            }
         }
 
         // state => [array of cities]
@@ -147,24 +153,29 @@ class NigeriaStatesCitiesSeeder extends Seeder
         foreach ($data as $stateName => $cities) {
             $stateSlug = Str::slug($stateName);
 
-            // Upsert the state with country_id
+            // Upsert the state with country_id if applicable
             $existing = DB::table('states')->where('slug', $stateSlug)->first();
 
             if (!$existing) {
-                $stateId = DB::table('states')->insertGetId([
-                    'country_id' => $nigeriaId,
+                $insertData = [
                     'name'       => $stateName,
                     'slug'       => $stateSlug,
                     'created_at' => now(),
                     'updated_at' => now(),
-                ]);
+                ];
+                if ($hasCountryIdColumn && $nigeriaId) {
+                    $insertData['country_id'] = $nigeriaId;
+                }
+                $stateId = DB::table('states')->insertGetId($insertData);
             } else {
                 $stateId = $existing->id;
-                // Update country_id on existing rows that don't have it yet
-                DB::table('states')
-                    ->where('id', $stateId)
-                    ->whereNull('country_id')
-                    ->update(['country_id' => $nigeriaId, 'updated_at' => now()]);
+                if ($hasCountryIdColumn && $nigeriaId) {
+                    // Update country_id on existing rows that don't have it yet
+                    DB::table('states')
+                        ->where('id', $stateId)
+                        ->whereNull('country_id')
+                        ->update(['country_id' => $nigeriaId, 'updated_at' => now()]);
+                }
             }
 
             foreach ($cities as $cityName) {
