@@ -46,17 +46,34 @@ class VendorAuthenticationController extends Controller
         $otp = rand(100000, 999999);
         $hashedOtp = Hash::make($otp);
         Cache::put('otp_'.$vendor->id, $hashedOtp, now()->addMinutes(10));
-        $vendor->notify(new OtpCodeNotification($otp));
+
+        $mailError = null;
+        try {
+            $vendor->notify(new OtpCodeNotification($otp));
+        } catch (\Throwable $e) {
+            $mailError = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error("Failed to send OTP email to vendor: " . $mailError . ". OTP: " . $otp);
+        }
 
         $token = $vendor->createToken('vendor_token')->plainTextToken;
 
         $vendorData = $vendor->load('state', 'city')->toArray();
         $vendorData['role'] = 'vendor';
 
-        return response()->json([
+        $responsePayload = [
             'user'  => $vendorData,
             'token' => $token,
-        ], 201);
+        ];
+
+        // Return dev_otp if debug mode is active or mail delivery failed
+        if (config('app.debug') || $mailError) {
+            $responsePayload['_dev_otp'] = $otp;
+            if ($mailError) {
+                $responsePayload['_mail_error'] = "Mail delivery failed, using dev OTP fallback: " . $mailError;
+            }
+        }
+
+        return response()->json($responsePayload, 201);
     }
 
     public function login(Request $request)

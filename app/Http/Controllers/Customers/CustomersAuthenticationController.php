@@ -70,7 +70,14 @@ class CustomersAuthenticationController extends Controller
         // Generate and cache a 6-digit OTP (10-minute TTL)
         $otp = rand(100000, 999999);
         Cache::put('otp_' . $user->id, Hash::make($otp), now()->addMinutes(10));
-        $user->notify(new OtpCodeNotification($otp));
+
+        $mailError = null;
+        try {
+            $user->notify(new OtpCodeNotification($otp));
+        } catch (\Throwable $e) {
+            $mailError = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error("Failed to send OTP email: " . $mailError . ". OTP: " . $otp);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -78,10 +85,20 @@ class CustomersAuthenticationController extends Controller
         $userData          = $user->load('state', 'city')->toArray();
         $userData['role']  = 'customer';
 
-        return response()->json([
+        $responsePayload = [
             'user'  => $userData,
             'token' => $token,
-        ], 201);
+        ];
+
+        // Return dev_otp if debug mode is active or mail delivery failed
+        if (config('app.debug') || $mailError) {
+            $responsePayload['_dev_otp'] = $otp;
+            if ($mailError) {
+                $responsePayload['_mail_error'] = "Mail delivery failed, using dev OTP fallback: " . $mailError;
+            }
+        }
+
+        return response()->json($responsePayload, 201);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

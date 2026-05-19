@@ -82,8 +82,23 @@ class OtpController extends Controller
         $otp = rand(100000, 999999);
         $hashedOtp = Hash::make($otp);
         Cache::put('otp_' . $model->id, $hashedOtp, now()->addMinutes(10));
-        $model->notify(new OtpCodeNotification($otp));
+        
+        $mailError = null;
+        try {
+            $model->notify(new OtpCodeNotification($otp));
+        } catch (\Throwable $e) {
+            $mailError = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error("Failed to resend OTP email: " . $mailError . ". OTP: " . $otp);
+        }
 
-        return response()->json(['message' => 'OTP resent'], 200);
+        $responsePayload = ['message' => 'OTP resent'];
+        if (config('app.debug') || $mailError) {
+            $responsePayload['_dev_otp'] = $otp;
+            if ($mailError) {
+                $responsePayload['_mail_error'] = "Mail delivery failed, using dev OTP fallback: " . $mailError;
+            }
+        }
+
+        return response()->json($responsePayload, 200);
     }
 }
