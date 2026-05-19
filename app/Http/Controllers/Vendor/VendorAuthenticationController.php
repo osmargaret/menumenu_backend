@@ -13,6 +13,14 @@ class VendorAuthenticationController extends Controller
 {
     public function register(Request $request)
     {
+        // Auto-seed if the table is empty (handles ephemeral Railway disks)
+        if (\App\Models\State::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'NigeriaStatesCitiesSeeder',
+                '--force' => true
+            ]);
+        }
+
         $data = $request->validate([
             'name'     => 'required|string|min:2|max:255|unique:vendors,name',
             'email'    => 'required|string|email:rfc|max:255|unique:vendors,email',
@@ -21,14 +29,6 @@ class VendorAuthenticationController extends Controller
             'state_id' => 'nullable|exists:states,id',
             'city_id'  => 'nullable|exists:cities,id',
         ]);
-
-        // Auto-seed if the table is empty (handles ephemeral Railway disks)
-        if (\App\Models\State::count() === 0) {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                '--class' => 'NigeriaStatesCitiesSeeder',
-                '--force' => true
-            ]);
-        }
 
         $stateId = $data['state_id'] ?? \App\Models\State::first()?->id ?? 1;
 

@@ -19,6 +19,14 @@ class CustomersAuthenticationController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     public function register(Request $request)
     {
+        // Auto-seed states if the table is empty (handles ephemeral Railway disks)
+        if (State::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'NigeriaStatesCitiesSeeder',
+                '--force' => true,
+            ]);
+        }
+
         $data = $request->validate([
             // Personal info
             'name'     => 'required|string|min:2|max:255',
@@ -45,14 +53,6 @@ class CustomersAuthenticationController extends Controller
                     ],
                 ], 422);
             }
-        }
-
-        // Auto-seed states if the table is empty (handles ephemeral Railway disks)
-        if (State::count() === 0) {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                '--class' => 'NigeriaStatesCitiesSeeder',
-                '--force' => true,
-            ]);
         }
 
         // state_id is NOT NULL in the DB — fall back to the first available state

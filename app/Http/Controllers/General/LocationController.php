@@ -18,6 +18,14 @@ class LocationController extends Controller
     */
     public function states()
     {
+        // Auto-seed states if the table is empty (handles ephemeral Railway disks)
+        if (State::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'NigeriaStatesCitiesSeeder',
+                '--force' => true,
+            ]);
+        }
+
         $states = State::all();
         return response()->json($states,200);
     }
@@ -29,13 +37,9 @@ class LocationController extends Controller
     | Used to populate the city dropdown after the user picks a state.
     |--------------------------------------------------------------------------
     */
-    public function cities()
+    public function cities(string $state)
     {
-        if(request()->has('state_id')){
-            $cities = City::where('state_id', request()->state_id)->get();
-        } else {
-            $cities = City::all();
-        }
+        $cities = City::where('state_id', $state)->get();
         return response()->json($cities);
     }
 }
