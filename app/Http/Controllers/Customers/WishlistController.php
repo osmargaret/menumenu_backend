@@ -14,7 +14,7 @@ class WishlistController extends Controller
     public function index()
     {
         $items = Wishlist::where('user_id', auth()->id())
-            ->with('meal.vendor')
+            ->with('meal.kitchen')
             ->latest()
             ->get();
 
@@ -35,7 +35,7 @@ class WishlistController extends Controller
             'meal_id' => $data['meal_id'],
         ]);
 
-        return response()->json($item->load('meal.vendor'), 201);
+        return response()->json($item->load('meal.kitchen'), 201);
     }
 
     /**

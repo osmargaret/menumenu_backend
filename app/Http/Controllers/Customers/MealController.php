@@ -10,7 +10,7 @@ class MealController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Meal::with('vendor');
+        $query = Meal::with('kitchen');
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -24,8 +24,8 @@ class MealController extends Controller
             $query->where('category', $request->category);
         }
 
-        if ($request->filled('vendor_id')) {
-            $query->where('vendor_id', $request->vendor_id);
+        if ($request->filled('kitchen_id')) {
+            $query->where('kitchen_id', $request->kitchen_id);
         }
 
         if ($request->has('available')) {
@@ -37,7 +37,7 @@ class MealController extends Controller
 
     public function show(Meal $meal)
     {
-        return $meal->load('vendor');
+        return $meal->load('kitchen');
     }
 
     public function store(\App\Http\Requests\StoreMealRequest $request)
@@ -47,7 +47,7 @@ class MealController extends Controller
         $this->authorize('create', Meal::class);
 
         $meal = Meal::create($data);
-        return response()->json($meal->load('vendor'), 201);
+        return response()->json($meal->load('kitchen'), 201);
     }
 
     public function update(\App\Http\Requests\UpdateMealRequest $request, Meal $meal)
@@ -56,7 +56,7 @@ class MealController extends Controller
 
         $data = $request->validated();
         $meal->update($data);
-        return $meal->fresh()->load('vendor');
+        return $meal->fresh()->load('kitchen');
     }
 
     public function destroy(Meal $meal)

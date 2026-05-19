@@ -33,10 +33,10 @@ class AdminRoleSeeder extends Seeder
             'update_users' => 'Update User Profiles',
             'view_users' => 'View User List',
             'view_transactions' => 'View Financial Transactions',
-            'manage_payouts' => 'Process Vendor Payouts',
+            'manage_payouts' => 'Process Kitchen Payouts',
             'manage_refunds' => 'Process Order Refunds',
-            'verify_vendors' => 'Verify & Approve Vendors',
-            'manage_vendors' => 'Manage Vendor Profiles',
+            'verify_kitchens' => 'Verify & Approve Kitchens',
+            'manage_kitchens' => 'Manage Kitchen Profiles',
             'moderate_reviews' => 'Moderate Customer Reviews',
             'manage_blog' => 'Manage Blog & CMS Content',
             'view_live_map' => 'View Live Order Logistics Map',
@@ -58,7 +58,7 @@ class AdminRoleSeeder extends Seeder
 
         // Manager
         $roles['manager']->permissions()->sync(Permission::whereIn('name', [
-            'view_users', 'update_users', 'manage_vendors', 'manage_orders', 
+            'view_users', 'update_users', 'manage_kitchens', 'manage_orders', 
             'manage_categories', 'view_analytics', 'view_live_map', 'manage_blog'
         ])->get());
 
@@ -74,7 +74,7 @@ class AdminRoleSeeder extends Seeder
 
         // Moderator
         $roles['moderator']->permissions()->sync(Permission::whereIn('name', [
-            'moderate_reviews', 'manage_blog', 'verify_vendors', 'view_users'
+            'moderate_reviews', 'manage_blog', 'verify_kitchens', 'view_users'
         ])->get());
 
         // 4. Create Admin Users

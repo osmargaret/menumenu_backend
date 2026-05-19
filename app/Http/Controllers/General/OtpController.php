@@ -7,19 +7,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 use App\Notifications\OtpCodeNotification;
 
 class OtpController extends Controller
 {
     /**
      * Resolve the authenticatable model by email.
-     * Checks users first, then vendors.
+     * Checks users first, then kitchens.
      */
     private function resolveModel(string $email, string $type = 'customer')
     {
-        if ($type === 'vendor') {
-            return Vendor::where('email', $email)->first();
+        if ($type === 'kitchen') {
+            return Kitchen::where('email', $email)->first();
         }
         return User::where('email', $email)->first();
     }
@@ -29,7 +29,7 @@ class OtpController extends Controller
         $request->validate([
             'email' => 'required|email',
             'otp'   => 'required|string|size:6',
-            'type'  => 'nullable|in:customer,vendor',
+            'type'  => 'nullable|in:customer,kitchen',
         ]);
 
         $type = $request->input('type', 'customer');
@@ -53,11 +53,11 @@ class OtpController extends Controller
         Cache::forget('otp_' . $model->id);
 
         // Create token
-        $tokenName = $type === 'vendor' ? 'vendor_token' : 'auth_token';
+        $tokenName = $type === 'kitchen' ? 'kitchen_token' : 'auth_token';
         $token = $model->createToken($tokenName)->plainTextToken;
 
         $modelData = $model->toArray();
-        $modelData['role'] = $type === 'vendor' ? 'vendor' : 'customer';
+        $modelData['role'] = $type === 'kitchen' ? 'kitchen' : 'customer';
 
         return response()->json([
             'user'  => $modelData,
@@ -69,7 +69,7 @@ class OtpController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'type'  => 'nullable|in:customer,vendor',
+            'type'  => 'nullable|in:customer,kitchen',
         ]);
 
         $type = $request->input('type', 'customer');

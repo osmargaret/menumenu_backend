@@ -13,7 +13,7 @@ class ReviewFactory extends Factory
     {
         return [
             'user_id' => null,
-            'vendor_id' => null,
+            'kitchen_id' => null,
             'meal_id' => null,
             'rating' => $this->faker->numberBetween(1, 5),
             'comment' => $this->faker->optional()->sentence(),

@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Vendor;
+use App\Models\Kitchen;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class VendorFactory extends Factory
+class KitchenFactory extends Factory
 {
-    protected $model = Vendor::class;
+    protected $model = Kitchen::class;
 
     public function definition()
     {

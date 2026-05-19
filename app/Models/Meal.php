@@ -10,12 +10,12 @@ class Meal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'vendor_id', 'name', 'slug', 'description', 'price', 'currency', 'available', 'prep_time', 'category', 'image_path',
+        'kitchen_id', 'name', 'slug', 'description', 'price', 'currency', 'available', 'prep_time', 'category', 'image_path',
     ];
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 
     public function reviews()

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('vendor_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('kitchen_id')->nullable()->constrained()->onDelete('set null');
             $table->integer('amount')->default(0);
             $table->text('reason')->nullable();
             $table->enum('status', ['pending','approved','rejected'])->default('pending');

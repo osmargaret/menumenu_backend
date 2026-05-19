@@ -16,11 +16,11 @@ class OrderController extends Controller
     {
         $user = auth()->user();
 
-        $query = Order::with('user', 'vendor', 'items.meal')->latest();
+        $query = Order::with('user', 'kitchen', 'items.meal')->latest();
 
-        // If a vendor is authenticated via vendor guard, show their orders
-        if ($user instanceof \App\Models\Vendor) {
-            $query->where('vendor_id', $user->id);
+        // If a kitchen is authenticated via kitchen guard, show their orders
+        if ($user instanceof \App\Models\Kitchen) {
+            $query->where('kitchen_id', $user->id);
         } else {
             // Customer sees only their own orders
             $query->where('user_id', $user->id);
@@ -31,13 +31,13 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        return $order->load('user', 'vendor', 'items.meal');
+        return $order->load('user', 'kitchen', 'items.meal');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'vendor_id'      => 'required|exists:vendors,id',
+            'kitchen_id'      => 'required|exists:kitchens,id',
             'subtotal'       => 'required|integer|min:0',
             'delivery_fee'   => 'nullable|integer|min:0',
             'discount'       => 'nullable|integer|min:0',
@@ -57,7 +57,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'order_number'   => 'FF-' . strtoupper(Str::random(8)),
                 'user_id'        => auth()->id(),
-                'vendor_id'      => $data['vendor_id'],
+                'kitchen_id'      => $data['kitchen_id'],
                 'subtotal'       => $data['subtotal'],
                 'delivery_fee'   => $data['delivery_fee'] ?? 0,
                 'discount'       => $data['discount'] ?? 0,
@@ -73,7 +73,7 @@ class OrderController extends Controller
                 OrderItem::create([
                     'order_id'  => $order->id,
                     'meal_id'   => $item['meal_id'],
-                    'vendor_id' => $data['vendor_id'],
+                    'kitchen_id' => $data['kitchen_id'],
                     'name'      => $meal ? $meal->name : 'Unknown',
                     'price'     => $item['price'],
                     'quantity'  => $item['quantity'],
@@ -82,7 +82,7 @@ class OrderController extends Controller
             }
         });
 
-        return response()->json($order->load('vendor', 'items.meal'), 201);
+        return response()->json($order->load('kitchen', 'items.meal'), 201);
     }
 
     public function update(\App\Http\Requests\UpdateOrderStatusRequest $request, Order $order)

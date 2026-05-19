@@ -9,12 +9,12 @@ class Payout extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vendor_id','amount','fee','status','method','meta','paid_at'];
+    protected $fillable = ['kitchen_id','amount','fee','status','method','meta','paid_at'];
 
     protected $casts = ['meta' => 'array', 'paid_at' => 'datetime'];
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 }

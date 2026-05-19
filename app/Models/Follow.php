@@ -9,15 +9,15 @@ class Follow extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'vendor_id'];
+    protected $fillable = ['user_id', 'kitchen_id'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 }

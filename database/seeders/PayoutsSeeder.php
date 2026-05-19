@@ -4,22 +4,22 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Payout;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 
 class PayoutsSeeder extends Seeder
 {
     public function run(): void
     {
-        $vendors = Vendor::limit(5)->get();
+        $kitchens = Kitchen::limit(5)->get();
 
-        foreach ($vendors as $vendor) {
+        foreach ($kitchens as $kitchen) {
             Payout::create([
-                'vendor_id' => $vendor->id,
+                'kitchen_id' => $kitchen->id,
                 'amount' => 10000,
                 'fee' => 500,
                 'status' => 'paid',
                 'method' => 'bank_transfer',
-                'meta' => ['tx' => 'seed-payout-'.$vendor->id],
+                'meta' => ['tx' => 'seed-payout-'.$kitchen->id],
                 'paid_at' => now(),
             ]);
         }

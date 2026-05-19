@@ -14,7 +14,7 @@ class StoreMealRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vendor_id'  => 'required|exists:vendors,id',
+            'kitchen_id'  => 'required|exists:kitchens,id',
             'name'       => 'required|string|max:255',
             'description'=> 'nullable|string',
             'price'      => 'required|integer|min:0',

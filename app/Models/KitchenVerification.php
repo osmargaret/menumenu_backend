@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VendorVerification extends Model
+class KitchenVerification extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vendor_id','status','reviewed_by','notes','reviewed_at'];
+    protected $fillable = ['kitchen_id','status','reviewed_by','notes','reviewed_at'];
 
     protected $casts = ['reviewed_at' => 'datetime'];
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 
     public function reviewer()

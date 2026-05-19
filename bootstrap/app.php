@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth'      => \App\Http\Middleware\EnsureIsAdmin::class,
             'customer.auth'   => \App\Http\Middleware\CustomerMiddleware::class,
-            'vendor.auth'     => \App\Http\Middleware\VendorMiddleware::class,
+            'kitchen.auth'     => \App\Http\Middleware\KitchenMiddleware::class,
             'detect.location' => \App\Http\Middleware\DetectStateByIp::class,
         ]);
     })

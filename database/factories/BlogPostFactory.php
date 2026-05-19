@@ -14,7 +14,7 @@ class BlogPostFactory extends Factory
     {
         $title = $this->faker->sentence(6);
         return [
-            'vendor_id' => null,
+            'kitchen_id' => null,
             'title' => $title,
             'slug' => Str::slug($title) . '-' . $this->faker->unique()->numberBetween(1, 9999),
             'excerpt' => $this->faker->sentence(),

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 use Illuminate\Http\Request;
 
-class VendorController extends Controller
+class KitchenController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Vendor::with('areas', 'meals', 'categories')
+        $query = Kitchen::with('areas', 'meals', 'categories')
             ->withCount('reviews');
 
         // Filter by state
@@ -49,35 +49,35 @@ class VendorController extends Controller
         return $query->latest()->paginate(20);
     }
 
-    public function show(Vendor $vendor)
+    public function show(Kitchen $kitchen)
     {
-        return $vendor->load('areas', 'meals', 'categories')
+        return $kitchen->load('areas', 'meals', 'categories')
             ->loadCount('reviews')
             ->loadAvg('reviews', 'rating');
     }
 
-    public function store(\App\Http\Requests\StoreVendorRequest $request)
+    public function store(\App\Http\Requests\StoreKitchenRequest $request)
     {
         $data = $request->validated();
         $data['user_id'] = auth()->id();
 
-        $vendor = Vendor::create($data);
-        return response()->json($vendor, 201);
+        $kitchen = Kitchen::create($data);
+        return response()->json($kitchen, 201);
     }
 
-    public function update(\App\Http\Requests\UpdateVendorRequest $request, Vendor $vendor)
+    public function update(\App\Http\Requests\UpdateKitchenRequest $request, Kitchen $kitchen)
     {
-        $this->authorize('update', $vendor);
+        $this->authorize('update', $kitchen);
 
         $data = $request->validated();
-        $vendor->update($data);
-        return $vendor->fresh()->load('areas', 'categories');
+        $kitchen->update($data);
+        return $kitchen->fresh()->load('areas', 'categories');
     }
 
-    public function destroy(Vendor $vendor)
+    public function destroy(Kitchen $kitchen)
     {
-        $this->authorize('delete', $vendor);
-        $vendor->delete();
+        $this->authorize('delete', $kitchen);
+        $kitchen->delete();
         return response()->noContent();
     }
 }

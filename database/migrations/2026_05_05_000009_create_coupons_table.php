@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->enum('type', ['percent', 'amount'])->default('percent');
             $table->integer('value')->default(0);
-            $table->foreignId('vendor_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('kitchen_id')->nullable()->constrained()->onDelete('set null');
             $table->unsignedInteger('uses')->default(0);
             $table->unsignedInteger('max_uses')->nullable();
             $table->timestamp('expires_at')->nullable();

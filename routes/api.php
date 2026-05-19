@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 use App\Http\Controllers\Customers\CustomersAuthenticationController;
-use App\Http\Controllers\Vendor\VendorAuthenticationController;
+use App\Http\Controllers\Kitchen\KitchenAuthenticationController;
 use App\Http\Controllers\Admin\AdminAuthenticationController;
 
 // ─── General (public/shared) ──────────────────────────────────────────────────
@@ -13,7 +13,7 @@ use App\Http\Controllers\General\LocationController;
 use App\Http\Controllers\General\CategoryController;
 
 // ─── Customer-facing ─────────────────────────────────────────────────────────
-use App\Http\Controllers\Customers\VendorController;
+use App\Http\Controllers\Customers\KitchenController;
 use App\Http\Controllers\Customers\MealController;
 use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\MessageController;
@@ -22,11 +22,11 @@ use App\Http\Controllers\Customers\WishlistController;
 use App\Http\Controllers\Customers\FollowController;
 use App\Http\Controllers\Customers\CouponController;
 
-// ─── Vendor-facing ───────────────────────────────────────────────────────────
-use App\Http\Controllers\Vendor\VendorDashboardController;
+// ─── Kitchen-facing ───────────────────────────────────────────────────────────
+use App\Http\Controllers\Kitchen\KitchenDashboardController;
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
-use App\Http\Controllers\Admin\VendorVerificationController;
+use App\Http\Controllers\Admin\KitchenVerificationController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\PayoutController;
 use App\Http\Controllers\Admin\AuditLogController;
@@ -58,12 +58,12 @@ Route::get('categories/{category}', [CategoryController::class, 'show']);
 
 /*
 |--------------------------------------------------------------------------
-| Vendors & Meals — public browsing
+| Kitchens & Meals — public browsing
 |--------------------------------------------------------------------------
 */
-Route::get('vendors',                    [VendorController::class, 'index']);
-Route::get('vendors/{vendor}',           [VendorController::class, 'show']);
-Route::get('vendors/{vendor}/reviews',   [ReviewController::class, 'index']);
+Route::get('kitchens',                    [KitchenController::class, 'index']);
+Route::get('kitchens/{kitchen}',           [KitchenController::class, 'show']);
+Route::get('kitchens/{kitchen}/reviews',   [ReviewController::class, 'index']);
 
 Route::get('meals',                      [MealController::class, 'index']);
 Route::get('meals/{meal}',               [MealController::class, 'show']);
@@ -82,11 +82,11 @@ Route::post('resend-otp',        [OtpController::class, 'resend']);
 
 /*
 |--------------------------------------------------------------------------
-| Vendor Authentication (public)
+| Kitchen Authentication (public)
 |--------------------------------------------------------------------------
 */
-Route::post('vendor-register', [VendorAuthenticationController::class, 'register']);
-Route::post('vendor-login',    [VendorAuthenticationController::class, 'login']);
+Route::post('kitchen-register', [KitchenAuthenticationController::class, 'register']);
+Route::post('kitchen-login',    [KitchenAuthenticationController::class, 'login']);
 
 /*
 |--------------------------------------------------------------------------
@@ -98,7 +98,7 @@ Route::post('admin-forgot-password', [AdminAuthenticationController::class, 'for
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes  (customers + vendors both use auth:sanctum)
+| Authenticated Routes  (customers + kitchens both use auth:sanctum)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
@@ -107,19 +107,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('customer/profile',   [CustomersAuthenticationController::class, 'getProfile']);
     Route::patch('customer/profile', [CustomersAuthenticationController::class, 'updateProfile']);
 
-    // ── Vendor Profile ────────────────────────────────────────────────────
-    Route::post('vendor/profile', [VendorAuthenticationController::class, 'profile']);
+    // ── Kitchen Profile ────────────────────────────────────────────────────
+    Route::post('kitchen/profile', [KitchenAuthenticationController::class, 'profile']);
 
-    // ── Vendor Dashboard ──────────────────────────────────────────────────
-    Route::get('vendor/dashboard', [VendorDashboardController::class, 'stats']);
-    Route::get('vendor/orders',    [VendorDashboardController::class, 'orders']);
-    Route::get('vendor/meals',     [VendorDashboardController::class, 'meals']);
+    // ── Kitchen Dashboard ──────────────────────────────────────────────────
+    Route::get('kitchen/dashboard', [KitchenDashboardController::class, 'stats']);
+    Route::get('kitchen/orders',    [KitchenDashboardController::class, 'orders']);
+    Route::get('kitchen/meals',     [KitchenDashboardController::class, 'meals']);
 
-    // ── Vendors (write) ───────────────────────────────────────────────────
-    Route::post('vendors',            [VendorController::class, 'store']);
-    Route::put('vendors/{vendor}',    [VendorController::class, 'update']);
-    Route::patch('vendors/{vendor}',  [VendorController::class, 'update']);
-    Route::delete('vendors/{vendor}', [VendorController::class, 'destroy']);
+    // ── Kitchens (write) ───────────────────────────────────────────────────
+    Route::post('kitchens',            [KitchenController::class, 'store']);
+    Route::put('kitchens/{kitchen}',    [KitchenController::class, 'update']);
+    Route::patch('kitchens/{kitchen}',  [KitchenController::class, 'update']);
+    Route::delete('kitchens/{kitchen}', [KitchenController::class, 'destroy']);
 
     // ── Meals (write) ─────────────────────────────────────────────────────
     Route::post('meals',          [MealController::class, 'store']);
@@ -135,7 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('orders/{order}',   [OrderController::class, 'destroy']);
 
     // ── Reviews ───────────────────────────────────────────────────────────
-    Route::post('vendors/{vendor}/reviews', [ReviewController::class, 'store']);
+    Route::post('kitchens/{kitchen}/reviews', [ReviewController::class, 'store']);
     Route::delete('reviews/{review}',       [ReviewController::class, 'destroy']);
 
     // ── Wishlist ──────────────────────────────────────────────────────────
@@ -145,7 +145,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ── Follows ───────────────────────────────────────────────────────────
     Route::get('follows',                      [FollowController::class, 'index']);
-    Route::post('vendors/{vendor}/follow',     [FollowController::class, 'toggle']);
+    Route::post('kitchens/{kitchen}/follow',     [FollowController::class, 'toggle']);
 
     // ── Coupons ───────────────────────────────────────────────────────────
     Route::post('coupons/validate', [CouponController::class, 'validate']);
@@ -167,8 +167,8 @@ Route::middleware(['auth:sanctum', 'admin.auth'])->prefix('admin')->group(functi
     Route::get('profile',  [AdminAuthenticationController::class, 'profile']);
     Route::post('logout',  [AdminAuthenticationController::class, 'logout']);
 
-    // Vendor verifications
-    Route::apiResource('vendor-verifications', VendorVerificationController::class);
+    // Kitchen verifications
+    Route::apiResource('kitchen-verifications', KitchenVerificationController::class);
 
     // Refunds & Payouts
     Route::apiResource('refunds', RefundController::class);

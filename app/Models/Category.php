@@ -17,8 +17,8 @@ class Category extends Model
         'is_visible' => 'boolean',
     ];
 
-    public function vendors()
+    public function kitchens()
     {
-        return $this->belongsToMany(Vendor::class, 'category_vendor');
+        return $this->belongsToMany(Kitchen::class, 'category_kitchen');
     }
 }

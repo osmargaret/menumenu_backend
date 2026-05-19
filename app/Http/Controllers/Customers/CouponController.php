@@ -16,7 +16,7 @@ class CouponController extends Controller
     {
         $data = $request->validate([
             'code'      => 'required|string',
-            'vendor_id' => 'nullable|exists:vendors,id',
+            'kitchen_id' => 'nullable|exists:kitchens,id',
             'subtotal'  => 'nullable|integer|min:0',
         ]);
 
@@ -36,9 +36,9 @@ class CouponController extends Controller
             return response()->json(['message' => 'This coupon has reached its usage limit'], 422);
         }
 
-        // Check vendor restriction
-        if ($coupon->vendor_id && isset($data['vendor_id']) && $coupon->vendor_id != $data['vendor_id']) {
-            return response()->json(['message' => 'This coupon is not valid for this vendor'], 422);
+        // Check kitchen restriction
+        if ($coupon->kitchen_id && isset($data['kitchen_id']) && $coupon->kitchen_id != $data['kitchen_id']) {
+            return response()->json(['message' => 'This coupon is not valid for this kitchen'], 422);
         }
 
         // Calculate discount amount

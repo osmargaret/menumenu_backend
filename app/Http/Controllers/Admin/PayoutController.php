@@ -10,18 +10,18 @@ class PayoutController extends Controller
 {
     public function index()
     {
-        return Payout::with('vendor')->latest()->paginate(20);
+        return Payout::with('kitchen')->latest()->paginate(20);
     }
 
     public function show(Payout $payout)
     {
-        return $payout->load('vendor');
+        return $payout->load('kitchen');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'vendor_id' => 'required|exists:vendors,id',
+            'kitchen_id' => 'required|exists:kitchens,id',
             'amount' => 'required|integer|min:0',
             'fee' => 'nullable|integer|min:0',
             'method' => 'nullable|string',

@@ -19,12 +19,12 @@ class CategoryController extends Controller
     }
 
     /**
-     * Show a single category with its vendors.
+     * Show a single category with its kitchens.
      */
     public function show(Category $category)
     {
         return response()->json(
-            $category->load('vendors')
+            $category->load('kitchens')
         );
     }
 

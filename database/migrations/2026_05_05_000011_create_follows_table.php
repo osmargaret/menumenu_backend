@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('follows', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            $table->unique(['user_id', 'vendor_id']);
+            $table->unique(['user_id', 'kitchen_id']);
         });
     }
 

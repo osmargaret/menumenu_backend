@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->foreignId('meal_id')->nullable()->constrained('meals')->onDelete('set null');
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->integer('price')->default(0);
             $table->integer('quantity')->default(1);

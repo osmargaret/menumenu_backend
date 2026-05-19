@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VendorMember extends Model
+class KitchenUser extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vendor_id', 'name', 'email', 'password','role', 'is_active'];
+    protected $fillable = ['kitchen_id', 'name', 'email', 'password','role', 'is_active'];
 
     protected $hidden = [
         'password'
@@ -27,8 +26,8 @@ class VendorMember extends Model
         ];
     }
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 }

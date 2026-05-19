@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('payouts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained()->cascadeOnDelete();
             $table->integer('amount');
             $table->integer('fee')->default(0);
             $table->enum('status', ['pending','paid','failed'])->default('pending');

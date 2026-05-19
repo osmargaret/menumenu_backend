@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('support_tickets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('vendor_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('kitchen_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('order_id')->nullable()->constrained()->onDelete('set null');
             $table->string('subject');
             $table->text('message');

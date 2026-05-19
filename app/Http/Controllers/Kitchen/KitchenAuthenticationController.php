@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Vendor;
+namespace App\Http\Controllers\Kitchen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use App\Notifications\OtpCodeNotification;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 
-class VendorAuthenticationController extends Controller
+class KitchenAuthenticationController extends Controller
 {
     public function register(Request $request)
     {
@@ -33,8 +33,9 @@ class VendorAuthenticationController extends Controller
         } catch (\Throwable $e) {}
 
         $data = $request->validate([
-            'name'     => 'required|string|min:2|max:255|unique:vendors,name',
-            'email'    => 'required|string|email:rfc|max:255|unique:vendors,email',
+            'business_name'     => 'required|string|min:2|max:255|unique:kitchens,name',
+            'owner_name'     => 'required|string|min:2|max:255',
+            'email'    => 'required|string|email:rfc|max:255|unique:kitchens,email',
             'password' => 'required|string|min:8|confirmed',
             'phone'    => 'nullable|string|max:20',
             'state_id' => 'nullable|exists:states,id',
@@ -43,7 +44,7 @@ class VendorAuthenticationController extends Controller
 
         $stateId = $data['state_id'] ?? \App\Models\State::first()?->id ?? 1;
 
-        $vendor = \App\Models\Vendor::create([
+        $kitchen = \App\Models\Kitchen::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
@@ -56,23 +57,23 @@ class VendorAuthenticationController extends Controller
         // Generate and send OTP
         $otp = rand(100000, 999999);
         $hashedOtp = Hash::make($otp);
-        Cache::put('otp_'.$vendor->id, $hashedOtp, now()->addMinutes(10));
+        Cache::put('otp_'.$kitchen->id, $hashedOtp, now()->addMinutes(10));
 
         $mailError = null;
         try {
-            $vendor->notify(new OtpCodeNotification($otp));
+            $kitchen->notify(new OtpCodeNotification($otp));
         } catch (\Throwable $e) {
             $mailError = $e->getMessage();
-            \Illuminate\Support\Facades\Log::error("Failed to send OTP email to vendor: " . $mailError . ". OTP: " . $otp);
+            \Illuminate\Support\Facades\Log::error("Failed to send OTP email to kitchen: " . $mailError . ". OTP: " . $otp);
         }
 
-        $token = $vendor->createToken('vendor_token')->plainTextToken;
+        $token = $kitchen->createToken('kitchen_token')->plainTextToken;
 
-        $vendorData = $vendor->load('state', 'city')->toArray();
-        $vendorData['role'] = 'vendor';
+        $kitchenData = $kitchen->load('state', 'city')->toArray();
+        $kitchenData['role'] = 'kitchen';
 
         $responsePayload = [
-            'user'  => $vendorData,
+            'user'  => $kitchenData,
             'token' => $token,
         ];
 
@@ -94,29 +95,29 @@ class VendorAuthenticationController extends Controller
             'password' => 'required',
         ]);
 
-        $vendor = \App\Models\Vendor::where('email', $request->email)->first();
+        $kitchen = \App\Models\Kitchen::where('email', $request->email)->first();
 
-        if (!$vendor || !\Illuminate\Support\Facades\Hash::check($request->password, $vendor->password)) {
+        if (!$kitchen || !\Illuminate\Support\Facades\Hash::check($request->password, $kitchen->password)) {
             return response()->json(['message' => 'Invalid login credentials'], 401);
         }
 
-        $token = $vendor->createToken('vendor_token')->plainTextToken;
+        $token = $kitchen->createToken('kitchen_token')->plainTextToken;
 
-        $vendorData = $vendor->load('state', 'city')->toArray();
-        $vendorData['role'] = 'vendor';
+        $kitchenData = $kitchen->load('state', 'city')->toArray();
+        $kitchenData['role'] = 'kitchen';
 
         return response()->json([
-            'user'  => $vendorData,
+            'user'  => $kitchenData,
             'token' => $token,
         ]);
     }
 
     public function profile(Request $request)
     {
-        $vendor = $request->user();
+        $kitchen = $request->user();
 
         // Additional sanity check just in case this route gets hit by another user type
-        if (!$vendor instanceof \App\Models\Vendor) {
+        if (!$kitchen instanceof \App\Models\Kitchen) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -130,14 +131,14 @@ class VendorAuthenticationController extends Controller
             'close_time' => 'sometimes',
         ]);
 
-        $vendor->update($data);
+        $kitchen->update($data);
 
-        $vendorData = $vendor->fresh()->load('state', 'city')->toArray();
-        $vendorData['role'] = 'vendor';
+        $kitchenData = $kitchen->fresh()->load('state', 'city')->toArray();
+        $kitchenData['role'] = 'kitchen';
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user'    => $vendorData,
+            'user'    => $kitchenData,
         ]);
     }
 }

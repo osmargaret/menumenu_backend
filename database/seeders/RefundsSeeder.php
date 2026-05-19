@@ -18,7 +18,7 @@ class RefundsSeeder extends Seeder
             Refund::create([
                 'order_id' => $order->id,
                 'user_id' => $order->user_id,
-                'vendor_id' => $order->vendor_id,
+                'kitchen_id' => $order->kitchen_id,
                 'amount' => (int) ($order->total * 0.5),
                 'reason' => 'Test refund for seeding',
                 'status' => 'approved',

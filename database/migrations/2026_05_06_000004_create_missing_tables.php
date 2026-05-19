@@ -18,11 +18,11 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Vendor Categories Pivot
-        Schema::create('category_vendor', function (Blueprint $table) {
+        // 2. Kitchen Categories Pivot
+        Schema::create('category_kitchen', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
 
@@ -59,7 +59,7 @@ return new class extends Migration
         Schema::dropIfExists('blog_likes');
         Schema::dropIfExists('blog_comments');
         Schema::dropIfExists('wishlists');
-        Schema::dropIfExists('category_vendor');
+        Schema::dropIfExists('category_kitchen');
         Schema::dropIfExists('categories');
     }
 };

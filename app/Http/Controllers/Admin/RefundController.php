@@ -10,12 +10,12 @@ class RefundController extends Controller
 {
     public function index()
     {
-        return Refund::with(['order','user','vendor'])->latest()->paginate(20);
+        return Refund::with(['order','user','kitchen'])->latest()->paginate(20);
     }
 
     public function show(Refund $refund)
     {
-        return $refund->load(['order','user','vendor']);
+        return $refund->load(['order','user','kitchen']);
     }
 
     public function store(Request $request)
@@ -23,7 +23,7 @@ class RefundController extends Controller
         $data = $request->validate([
             'order_id' => 'required|exists:orders,id',
             'user_id' => 'required|exists:users,id',
-            'vendor_id' => 'nullable|exists:vendors,id',
+            'kitchen_id' => 'nullable|exists:kitchens,id',
             'amount' => 'required|integer|min:0',
             'reason' => 'nullable|string',
         ]);

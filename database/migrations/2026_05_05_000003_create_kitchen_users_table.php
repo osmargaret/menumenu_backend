@@ -6,11 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('vendor_members', function (Blueprint $table) {
+        Schema::create('kitchen_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_id')->constrained('vendors')->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained('kitchens')->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
@@ -20,8 +23,11 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('vendor_members');
+        Schema::dropIfExists('kitchen_users');
     }
 };

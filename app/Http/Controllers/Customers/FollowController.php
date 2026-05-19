@@ -4,18 +4,18 @@ namespace App\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Follow;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 use Illuminate\Http\Request;
 
 class FollowController extends Controller
 {
     /**
-     * List vendors that the authenticated user follows.
+     * List kitchens that the authenticated user follows.
      */
     public function index()
     {
         $follows = Follow::where('user_id', auth()->id())
-            ->with('vendor:id,name,slug,avatar_path,tagline,is_open')
+            ->with('kitchen:id,name,slug,avatar_path,tagline,is_open')
             ->latest()
             ->get();
 
@@ -23,15 +23,15 @@ class FollowController extends Controller
     }
 
     /**
-     * Toggle follow/unfollow a vendor.
-     * POST /vendors/{vendor}/follow
+     * Toggle follow/unfollow a kitchen.
+     * POST /kitchens/{kitchen}/follow
      */
-    public function toggle(Vendor $vendor)
+    public function toggle(Kitchen $kitchen)
     {
         $userId = auth()->id();
 
         $existing = Follow::where('user_id', $userId)
-            ->where('vendor_id', $vendor->id)
+            ->where('kitchen_id', $kitchen->id)
             ->first();
 
         if ($existing) {
@@ -41,7 +41,7 @@ class FollowController extends Controller
 
         Follow::create([
             'user_id'   => $userId,
-            'vendor_id' => $vendor->id,
+            'kitchen_id' => $kitchen->id,
         ]);
 
         return response()->json(['following' => true], 201);

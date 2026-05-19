@@ -14,7 +14,7 @@ class OrderItemFactory extends Factory
         return [
             'order_id' => null,
             'meal_id' => null,
-            'vendor_id' => null,
+            'kitchen_id' => null,
             'name' => $this->faker->words(2, true),
             'price' => $this->faker->numberBetween(400, 5000),
             'quantity' => $this->faker->numberBetween(1, 4),

@@ -9,7 +9,7 @@ class Refund extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id','user_id','vendor_id','amount','reason','status','processed_by','processed_at'];
+    protected $fillable = ['order_id','user_id','kitchen_id','amount','reason','status','processed_by','processed_at'];
 
     protected $casts = ['processed_at' => 'datetime'];
 
@@ -23,8 +23,8 @@ class Refund extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 }

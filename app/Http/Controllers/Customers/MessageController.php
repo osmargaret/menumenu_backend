@@ -49,25 +49,25 @@ class MessageController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'receiver_id' => 'required_without:vendor_id|exists:users,id',
+            'receiver_id' => 'required_without:kitchen_id|exists:users,id',
             'body' => 'required|string',
-            'vendor_id' => 'required_without:receiver_id|exists:vendors,id',
+            'kitchen_id' => 'required_without:receiver_id|exists:kitchens,id',
             'meta' => 'nullable|array',
         ]);
 
         $receiverId = $data['receiver_id'] ?? null;
-        $vendorId = $data['vendor_id'] ?? null;
+        $kitchenId = $data['kitchen_id'] ?? null;
 
-        if (!$receiverId && $vendorId) {
-            $vendor = \App\Models\Vendor::find($vendorId);
-            $receiverId = $vendor->user_id;
+        if (!$receiverId && $kitchenId) {
+            $kitchen = \App\Models\Kitchen::find($kitchenId);
+            $receiverId = $kitchen->user_id;
         }
 
         $message = Message::create([
             'sender_id' => Auth::id(),
             'receiver_id' => $receiverId,
             'body' => $data['body'],
-            'vendor_id' => $vendorId,
+            'kitchen_id' => $kitchenId,
             'meta' => $data['meta'] ?? null,
         ]);
 

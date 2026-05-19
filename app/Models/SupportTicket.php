@@ -9,16 +9,16 @@ class SupportTicket extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'vendor_id', 'order_id', 'subject', 'message', 'status'];
+    protected $fillable = ['user_id', 'kitchen_id', 'order_id', 'subject', 'message', 'status'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 
     public function order()

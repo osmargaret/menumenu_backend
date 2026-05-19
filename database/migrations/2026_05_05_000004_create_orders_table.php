@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('vendor_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained()->cascadeOnDelete();
             $table->integer('subtotal')->default(0);
             $table->integer('delivery_fee')->default(0);
             $table->integer('discount')->default(0);

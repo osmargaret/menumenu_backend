@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('receiver_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('vendor_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('kitchen_id')->nullable()->constrained()->onDelete('set null');
             $table->text('body');
             $table->boolean('is_read')->default(false);
             $table->json('meta')->nullable();

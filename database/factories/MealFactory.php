@@ -14,7 +14,7 @@ class MealFactory extends Factory
     {
         $name = $this->faker->words(3, true);
         return [
-            'vendor_id' => null,
+            'kitchen_id' => null,
             'name' => ucfirst($name),
             'slug' => Str::slug($name) . '-' . $this->faker->unique()->numberBetween(1, 9999),
             'description' => $this->faker->sentence(),

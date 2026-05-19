@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Vendor extends Authenticatable implements MustVerifyEmail
+class Kitchen extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, HasApiTokens, Notifiable;
 
@@ -51,7 +51,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
 
     public function areas()
     {
-        return $this->hasMany(VendorArea::class);
+        return $this->hasMany(KitchenLogistics::class);
     }
 
     public function meals()
@@ -61,7 +61,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
 
     public function categories()
     {
-        return $this->belongsToMany(\App\Models\Category::class, 'category_vendor');
+        return $this->belongsToMany(\App\Models\Category::class, 'category_kitchen');
     }
 
     public function reviews()
@@ -76,7 +76,7 @@ class Vendor extends Authenticatable implements MustVerifyEmail
 
     public function team()
     {
-        return $this->hasMany(VendorMember::class);
+        return $this->hasMany(KitchenUser::class);
     }
 
     public function blogPosts()

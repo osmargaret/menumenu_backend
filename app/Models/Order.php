@@ -10,7 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_number', 'user_id', 'vendor_id', 'subtotal', 'delivery_fee', 'discount', 'total', 'status', 'payment_method', 'address', 'meta',
+        'order_number', 'user_id', 'kitchen_id', 'subtotal', 'delivery_fee', 'discount', 'total', 'status', 'payment_method', 'address', 'meta',
     ];
 
     protected $casts = [
@@ -23,9 +23,9 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 
     public function items()

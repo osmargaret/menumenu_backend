@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('vendor_areas', function (Blueprint $table) {
+        Schema::create('kitchen_logistics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_id')->constrained('vendors')->cascadeOnDelete();
+            $table->foreignId('kitchen_id')->constrained('kitchens')->cascadeOnDelete();
             $table->string('name');
             $table->integer('fee')->default(500);
             $table->integer('min_delivery_time')->nullable();
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('vendor_areas');
+        Schema::dropIfExists('kitchen_logistics');
     }
 };

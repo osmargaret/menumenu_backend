@@ -10,13 +10,13 @@ class BlogPost extends Model
     use HasFactory;
 
     protected $fillable = [
-        'vendor_id', 'title', 'slug', 'excerpt', 'body', 'cover_path', 'views', 'is_published', 'published_at',
+        'kitchen_id', 'title', 'slug', 'excerpt', 'body', 'cover_path', 'views', 'is_published', 'published_at',
     ];
 
     protected $dates = ['published_at'];
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 }

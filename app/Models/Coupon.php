@@ -10,13 +10,13 @@ class Coupon extends Model
     use HasFactory;
 
     protected $fillable = [
-        'code', 'type', 'value', 'vendor_id', 'uses', 'max_uses', 'expires_at',
+        'code', 'type', 'value', 'kitchen_id', 'uses', 'max_uses', 'expires_at',
     ];
 
     protected $dates = ['expires_at'];
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Kitchen::class);
     }
 }

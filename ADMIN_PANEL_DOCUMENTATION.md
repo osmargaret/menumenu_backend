@@ -12,7 +12,7 @@ This document describes the admin panel features, pages, architecture and develo
 - /login — Admin authentication page.
 - /dashboard — KPIs, charts, live orders feed, quick actions.
 - /categories — Category CRUD and ordering.
-- /vendors — Vendor list, status (verified, suspended), KYC link to verification page.
+- /vendors — Kitchen list, status (verified, suspended), KYC link to verification page.
 - /orders — Global order list with filters, status update actions, and detail view.
 - /users — User list, search, ban/restore actions.
 - /settings — Platform preferences and feature toggles.
@@ -44,14 +44,14 @@ The backend supports admin features via the following tables (newly added for ad
 
 - `vendor_verifications` — Stores KYC/verification requests and review status.
 - `refunds` — Refund requests and processing state.
-- `payouts` — Vendor payout records.
+- `payouts` — Kitchen payout records.
 - `audit_logs` — System audit trail entries.
 - `settings` — Key/value store for global configuration.
 - `roles` and `role_user` — Simple role assignment for staff accounts.
 
 ## Developer Notes
 
-- Database migrations and Eloquent models were added to the API repository to support admin features. See `database/migrations/2026_05_05_000015_*` through `000020_*` for the new migrations and `app/Models` for new models (`VendorVerification`, `Refund`, `Payout`, `AuditLog`, `Setting`, `Role`).
+- Database migrations and Eloquent models were added to the API repository to support admin features. See `database/migrations/2026_05_05_000015_*` through `000020_*` for the new migrations and `app/Models` for new models (`KitchenVerification`, `Refund`, `Payout`, `AuditLog`, `Setting`, `Role`).
 - Run migrations locally:
 ```powershell
 composer dump-autoload
@@ -72,4 +72,4 @@ php artisan migrate
 
 ---
 
-If you want, I can now scaffold API controllers and routes for these admin resources (`VendorVerificationController`, `RefundController`, `PayoutController`, `SettingController`, `AuditLogController`, `RoleController`) and wire API routes under `routes/api.php`.
+If you want, I can now scaffold API controllers and routes for these admin resources (`KitchenVerificationController`, `RefundController`, `PayoutController`, `SettingController`, `AuditLogController`, `RoleController`) and wire API routes under `routes/api.php`.

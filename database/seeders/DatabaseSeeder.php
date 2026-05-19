@@ -18,11 +18,11 @@ class DatabaseSeeder extends Seeder
             NigeriaStatesCitiesSeeder::class,
             AdminRoleSeeder::class,
             UsersTableSeeder::class,
-            VendorsTableSeeder::class,
+            KitchensTableSeeder::class,
             MealsTableSeeder::class,
             BlogSeeder::class,
             OrdersTableSeeder::class,
-            VendorVerificationsSeeder::class,
+            KitchenVerificationsSeeder::class,
             RefundsSeeder::class,
             PayoutsSeeder::class,
         ]);

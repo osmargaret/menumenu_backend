@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Meal;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 
 class MealPolicy
 {
@@ -24,7 +24,7 @@ class MealPolicy
             return true;
         }
 
-        return $meal->vendor && $meal->vendor->user_id === $user->id;
+        return $meal->kitchen && $meal->kitchen->user_id === $user->id;
     }
 
     public function delete(User $user, Meal $meal): bool

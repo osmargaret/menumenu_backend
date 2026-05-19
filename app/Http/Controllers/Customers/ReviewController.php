@@ -4,18 +4,18 @@ namespace App\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
-use App\Models\Vendor;
+use App\Models\Kitchen;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
     /**
-     * List reviews for a vendor.
-     * GET /vendors/{vendor}/reviews
+     * List reviews for a kitchen.
+     * GET /kitchens/{kitchen}/reviews
      */
-    public function index(Vendor $vendor)
+    public function index(Kitchen $kitchen)
     {
-        $reviews = $vendor->reviews()
+        $reviews = $kitchen->reviews()
             ->with('user:id,name')
             ->latest()
             ->paginate(15);
@@ -24,10 +24,10 @@ class ReviewController extends Controller
     }
 
     /**
-     * Submit a review for a vendor.
-     * POST /vendors/{vendor}/reviews
+     * Submit a review for a kitchen.
+     * POST /kitchens/{kitchen}/reviews
      */
-    public function store(Request $request, Vendor $vendor)
+    public function store(Request $request, Kitchen $kitchen)
     {
         $data = $request->validate([
             'rating'  => 'required|integer|min:1|max:5',
@@ -35,9 +35,9 @@ class ReviewController extends Controller
             'meal_id' => 'nullable|exists:meals,id',
         ]);
 
-        // Prevent duplicate reviews from the same user for this vendor
+        // Prevent duplicate reviews from the same user for this kitchen
         $existing = Review::where('user_id', auth()->id())
-            ->where('vendor_id', $vendor->id)
+            ->where('kitchen_id', $kitchen->id)
             ->first();
 
         if ($existing) {
@@ -48,7 +48,7 @@ class ReviewController extends Controller
 
         $review = Review::create([
             'user_id'   => auth()->id(),
-            'vendor_id' => $vendor->id,
+            'kitchen_id' => $kitchen->id,
             'meal_id'   => $data['meal_id'] ?? null,
             'rating'    => $data['rating'],
             'comment'   => $data['comment'] ?? null,

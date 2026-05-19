@@ -19,12 +19,12 @@ class OrderPolicy
 
     public function update(User $user, Order $order): bool
     {
-        // allow admin or vendor owner to update status
+        // allow admin or kitchen owner to update status
         if ($user->isAdmin()) {
             return true;
         }
 
-        return $order->vendor && $order->vendor->user_id === $user->id;
+        return $order->kitchen && $order->kitchen->user_id === $user->id;
     }
 
     public function delete(User $user, Order $order): bool

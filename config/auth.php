@@ -44,9 +44,9 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
-        'vendor' => [
+        'kitchen' => [
             'driver' => 'session',
-            'provider' => 'vendors',
+            'provider' => 'kitchens',
         ],
     ],
 
@@ -76,9 +76,9 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
-        'vendors' => [
+        'kitchens' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Vendor::class,
+            'model' => App\Models\Kitchen::class,
         ],
 
         // 'users' => [

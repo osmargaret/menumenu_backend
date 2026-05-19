@@ -75,14 +75,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(City::class);
     }
 
-    public function vendor()
+    public function kitchen()
     {
-        return $this->hasOne(Vendor::class);
+        return $this->hasOne(Kitchen::class);
     }
 
-    public function vendors()
+    public function kitchens()
     {
-        return $this->hasMany(Vendor::class);
+        return $this->hasMany(Kitchen::class);
     }
 
     public function orders()

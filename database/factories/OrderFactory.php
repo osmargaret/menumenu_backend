@@ -15,7 +15,7 @@ class OrderFactory extends Factory
         return [
             'order_number' => strtoupper(Str::random(10)),
             'user_id' => null,
-            'vendor_id' => null,
+            'kitchen_id' => null,
             'subtotal' => 0,
             'delivery_fee' => 0,
             'discount' => 0,

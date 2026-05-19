@@ -9,21 +9,21 @@ class MealsTableSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure meals are attached to vendors created in VendorsTableSeeder
-        $vendors = \App\Models\Vendor::all();
+        // Ensure meals are attached to kitchens created in KitchensTableSeeder
+        $kitchens = \App\Models\Kitchen::all();
 
-        if ($vendors->isEmpty()) {
-            // fallback: create some vendors first
-            $vendor = \App\Models\Vendor::factory()->create();
-            Meal::factory()->count(10)->create(['vendor_id' => $vendor->id]);
+        if ($kitchens->isEmpty()) {
+            // fallback: create some kitchens first
+            $kitchen = \App\Models\Kitchen::factory()->create();
+            Meal::factory()->count(10)->create(['kitchen_id' => $kitchen->id]);
             return;
         }
 
-        foreach ($vendors as $vendor) {
-            if ($vendor->meals()->exists()) {
+        foreach ($kitchens as $kitchen) {
+            if ($kitchen->meals()->exists()) {
                 continue;
             }
-            Meal::factory()->count(6)->create(['vendor_id' => $vendor->id]);
+            Meal::factory()->count(6)->create(['kitchen_id' => $kitchen->id]);
         }
     }
 }
