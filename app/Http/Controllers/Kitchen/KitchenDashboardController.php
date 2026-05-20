@@ -6,19 +6,41 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Meal;
 use App\Models\Kitchen;
+use App\Models\KitchenUser;
 use Illuminate\Http\Request;
 
 class KitchenDashboardController extends Controller
 {
+    /**
+     * Resolve the kitchen for the authenticated user via kitchen_users pivot.
+     */
+    private function resolveKitchen(Request $request): ?Kitchen
+    {
+        $user = $request->user();
+
+        // Direct kitchen auth (legacy, if still used)
+        if ($user instanceof Kitchen) {
+            return $user;
+        }
+
+        // User-based auth: find their kitchen via kitchen_users
+        $kitchenUser = KitchenUser::where('user_id', $user->id)->first();
+        if ($kitchenUser) {
+            return Kitchen::find($kitchenUser->kitchen_id);
+        }
+
+        return null;
+    }
+
     /**
      * Get the kitchen dashboard stats.
      * GET /kitchen/dashboard
      */
     public function stats(Request $request)
     {
-        $kitchen = $request->user();
+        $kitchen = $this->resolveKitchen($request);
 
-        if (!$kitchen instanceof \App\Models\Kitchen) {
+        if (!$kitchen) {
             return response()->json(['message' => 'Unauthorized: kitchen only'], 403);
         }
 
@@ -43,9 +65,9 @@ class KitchenDashboardController extends Controller
      */
     public function orders(Request $request)
     {
-        $kitchen = $request->user();
+        $kitchen = $this->resolveKitchen($request);
 
-        if (!$kitchen instanceof \App\Models\Kitchen) {
+        if (!$kitchen) {
             return response()->json(['message' => 'Unauthorized: kitchen only'], 403);
         }
 
@@ -66,9 +88,9 @@ class KitchenDashboardController extends Controller
      */
     public function meals(Request $request)
     {
-        $kitchen = $request->user();
+        $kitchen = $this->resolveKitchen($request);
 
-        if (!$kitchen instanceof \App\Models\Kitchen) {
+        if (!$kitchen) {
             return response()->json(['message' => 'Unauthorized: kitchen only'], 403);
         }
 
@@ -77,3 +99,4 @@ class KitchenDashboardController extends Controller
             ->paginate(20);
     }
 }
+

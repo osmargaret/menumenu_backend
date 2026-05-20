@@ -17,13 +17,13 @@ class AdminAuthenticationController extends Controller
             'password' => 'required',
         ]);
 
-        $admin = Admin::where('email', $request->email)->first();
+        $admin = Admin::with('role')->where('email', $request->email)->first();
 
         if ($admin && Hash::check($request->password, $admin->password)) {
             $token = $admin->createToken('admin-token')->plainTextToken;
 
             $adminData = $admin->toArray();
-            $adminData['role'] = 'admin'; // Or super_admin if there's a specific check
+            $adminData['role'] = $admin->role?->name ?? 'admin';
 
             return response()->json([
                 'status' => 'success',

@@ -186,6 +186,7 @@ class NigeriaStatesCitiesSeeder extends Seeder
                     ['slug' => $citySlug, 'state_id' => $stateId],
                     [
                         'state_id'   => $stateId,
+                        'country_id' => $nigeriaId,
                         'name'       => $cityName,
                         'slug'       => $citySlug,
                         'created_at' => now(),

@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kitchen_users', function (Blueprint $table) {
+        Schema::create('kitchen_verifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kitchen_id')->constrained('kitchens')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('role')->nullable();
-            $table->enum('status', ['pending', 'accepted','rejected'])->default('pending');
-            $table->softDeletes();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->text('notes')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
-            $table->unique('user_id');
         });
     }
 
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kitchen_users');
+        Schema::dropIfExists('kitchen_verifications');
     }
 };

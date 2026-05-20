@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use App\Notifications\OtpCodeNotification;
 use App\Models\Kitchen;
+use App\Models\User;
+use App\Models\KitchenUser;
 
 class KitchenAuthenticationController extends Controller
 {
@@ -35,7 +37,7 @@ class KitchenAuthenticationController extends Controller
         $data = $request->validate([
             'business_name'     => 'required|string|min:2|max:255|unique:kitchens,name',
             'owner_name'     => 'required|string|min:2|max:255',
-            'email'    => 'required|string|email:rfc|max:255|unique:kitchens,email',
+            'email'    => 'required|string|email:rfc|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'phone'    => 'nullable|string|max:20',
             'state_id' => 'nullable|exists:states,id',
@@ -44,14 +46,31 @@ class KitchenAuthenticationController extends Controller
 
         $stateId = $data['state_id'] ?? \App\Models\State::first()?->id ?? 1;
 
-        $kitchen = \App\Models\Kitchen::create([
-            'name'     => $data['name'],
+        $user = User::create([
+            'name'     => $data['owner_name'],
             'email'    => $data['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
-            'slug'     => \Illuminate\Support\Str::slug($data['name']) . '-' . uniqid(),
+            'password' => Hash::make($data['password']),
             'phone'    => $data['phone'] ?? null,
             'state_id' => $stateId,
             'city_id'  => $data['city_id'] ?? null,
+        ]);
+
+        $kitchen = Kitchen::create([
+            'user_id'  => $user->id,
+            'name'     => $data['business_name'],
+            'email'    => $data['email'],
+            'password' => Hash::make($data['password']),
+            'slug'     => \Illuminate\Support\Str::slug($data['business_name']) . '-' . uniqid(),
+            'phone'    => $data['phone'] ?? null,
+            'state_id' => $stateId,
+            'city_id'  => $data['city_id'] ?? null,
+        ]);
+
+        KitchenUser::create([
+            'kitchen_id' => $kitchen->id,
+            'user_id'    => $user->id,
+            'role'       => 'owner',
+            'status'     => 'accepted'
         ]);
 
         // Generate and send OTP
@@ -95,21 +114,48 @@ class KitchenAuthenticationController extends Controller
             'password' => 'required',
         ]);
 
-        $kitchen = \App\Models\Kitchen::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if (!$kitchen || !\Illuminate\Support\Facades\Hash::check($request->password, $kitchen->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid login credentials'], 401);
         }
 
-        $token = $kitchen->createToken('kitchen_token')->plainTextToken;
+        $kitchenUser = KitchenUser::where('user_id', $user->id)->first();
 
-        $kitchenData = $kitchen->load('state', 'city')->toArray();
-        $kitchenData['role'] = 'kitchen';
+        if (!$kitchenUser) {
+            return response()->json(['message' => 'You do not belong to any kitchen.'], 403);
+        }
 
-        return response()->json([
-            'user'  => $kitchenData,
-            'token' => $token,
-        ]);
+        $kitchen = $kitchenUser->kitchen;
+
+        // Generate and cache a 6-digit OTP (10-minute TTL)
+        $otp = rand(100000, 999999);
+        $hashedOtp = Hash::make($otp);
+        Cache::put('otp_' . $kitchen->id, $hashedOtp, now()->addMinutes(10));
+
+        $mailError = null;
+        try {
+            $user->notify(new \App\Notifications\OtpCodeNotification($otp));
+        } catch (\Throwable $e) {
+            $mailError = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error("Failed to send kitchen login OTP email: " . $mailError . ". OTP: " . $otp);
+        }
+
+        $responsePayload = [
+            'otp_required' => true,
+            'email'        => $user->email,
+            'type'         => 'kitchen',
+            'message'      => 'A verification code has been sent to your email.',
+        ];
+
+        if (config('app.debug') || $mailError) {
+            $responsePayload['_dev_otp'] = $otp;
+            if ($mailError) {
+                $responsePayload['_mail_error'] = "Mail delivery failed, using dev OTP fallback: " . $mailError;
+            }
+        }
+
+        return response()->json($responsePayload);
     }
 
     public function profile(Request $request)
@@ -117,7 +163,7 @@ class KitchenAuthenticationController extends Controller
         $kitchen = $request->user();
 
         // Additional sanity check just in case this route gets hit by another user type
-        if (!$kitchen instanceof \App\Models\Kitchen) {
+        if (!$kitchen instanceof Kitchen) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -142,3 +188,4 @@ class KitchenAuthenticationController extends Controller
         ]);
     }
 }
+

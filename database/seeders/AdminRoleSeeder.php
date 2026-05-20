@@ -78,7 +78,6 @@ class AdminRoleSeeder extends Seeder
         ])->get());
 
         // 4. Create Admin Users
-        $stateId = DB::table('states')->first()->id ?? 1;
         $password = Hash::make('12345678');
 
         $users = [
@@ -110,25 +109,14 @@ class AdminRoleSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            $user = User::updateOrCreate(
+            \App\Models\Admin::updateOrCreate(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
                     'password' => $password,
-                    'state_id' => $stateId,
+                    'role_id' => $roles[$userData['role']]->id,
                 ]
             );
-
-            $user->roles()->sync([$roles[$userData['role']]->id]);
         }
-
-        // 5. Create Dedicated Admin records (for the new Admin model)
-        \App\Models\Admin::updateOrCreate(
-            ['email' => 'superadmin@menumenu.com'],
-            [
-                'name' => 'Super Admin',
-                'password' => Hash::make('12345678'),
-            ]
-        );
     }
 }

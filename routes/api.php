@@ -86,7 +86,9 @@ Route::post('resend-otp',        [OtpController::class, 'resend']);
 |--------------------------------------------------------------------------
 */
 Route::post('kitchen-register', [KitchenAuthenticationController::class, 'register']);
+Route::post('vendor-register',  [KitchenAuthenticationController::class, 'register']); // alias for frontend
 Route::post('kitchen-login',    [KitchenAuthenticationController::class, 'login']);
+Route::post('vendor-login',     [KitchenAuthenticationController::class, 'login']);     // alias for frontend
 
 /*
 |--------------------------------------------------------------------------

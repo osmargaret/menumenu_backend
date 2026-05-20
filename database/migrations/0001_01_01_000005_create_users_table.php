@@ -15,14 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
             $table->timestamp('two_factor_confirmed_at')->nullable();
+            $table->unsignedBigInteger('state_id');
+            $table->unsignedBigInteger('city_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->foreignId('state_id')->constrained('states');
+            $table->foreign('state_id')->references('id')->on('states')->cascadeOnDelete(); 
+            
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

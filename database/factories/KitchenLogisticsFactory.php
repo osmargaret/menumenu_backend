@@ -13,7 +13,8 @@ class KitchenLogisticsFactory extends Factory
     {
         return [
             'kitchen_id' => null,
-            'name' => $this->faker->city(),
+            'city_id' => \App\Models\City::first()?->id ?? 1,
+            'town' => $this->faker->city(),
             'fee' => $this->faker->numberBetween(300, 1200),
             'min_delivery_time' => $this->faker->numberBetween(15, 60),
         ];

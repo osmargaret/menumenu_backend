@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Category;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,7 +62,7 @@ class Kitchen extends Authenticatable implements MustVerifyEmail
 
     public function categories()
     {
-        return $this->belongsToMany(\App\Models\Category::class, 'category_kitchen');
+        return $this->belongsToMany(Category::class, 'kitchen_categories');
     }
 
     public function reviews()

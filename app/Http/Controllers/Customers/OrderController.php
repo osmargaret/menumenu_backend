@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Meal;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\KitchenUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,9 +19,10 @@ class OrderController extends Controller
 
         $query = Order::with('user', 'kitchen', 'items.meal')->latest();
 
-        // If a kitchen is authenticated via kitchen guard, show their orders
-        if ($user instanceof \App\Models\Kitchen) {
-            $query->where('kitchen_id', $user->id);
+        // Check if the user belongs to a kitchen (vendor view)
+        $kitchenUser = KitchenUser::where('user_id', $user->id)->first();
+        if ($kitchenUser) {
+            $query->where('kitchen_id', $kitchenUser->kitchen_id);
         } else {
             // Customer sees only their own orders
             $query->where('user_id', $user->id);

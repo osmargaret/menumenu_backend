@@ -76,6 +76,7 @@ class CustomersAuthenticationController extends Controller
             'password' => Hash::make($data['password']),
             'phone'    => $data['phone'] ?? null,
             'state_id' => $stateId,
+            'city_id'  => $data['city_id'] ?? null,
         ]);
 
         // Generate and cache a 6-digit OTP (10-minute TTL)
@@ -126,17 +127,35 @@ class CustomersAuthenticationController extends Controller
             return response()->json(['message' => 'Invalid login credentials'], 401);
         }
 
-        $user  = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = User::where('email', $request->email)->firstOrFail();
 
-        // Load location objects so the frontend has names, not just IDs
-        $userData         = $user->load('state', 'city')->toArray();
-        $userData['role'] = 'customer';
+        // Generate and cache a 6-digit OTP (10-minute TTL)
+        $otp = rand(100000, 999999);
+        Cache::put('otp_' . $user->id, Hash::make($otp), now()->addMinutes(10));
 
-        return response()->json([
-            'user'  => $userData,
-            'token' => $token,
-        ]);
+        $mailError = null;
+        try {
+            $user->notify(new OtpCodeNotification($otp));
+        } catch (\Throwable $e) {
+            $mailError = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error("Failed to send login OTP email: " . $mailError . ". OTP: " . $otp);
+        }
+
+        $responsePayload = [
+            'otp_required' => true,
+            'email'        => $user->email,
+            'message'      => 'A verification code has been sent to your email.',
+        ];
+
+        // Return dev_otp if debug mode is active or mail delivery failed
+        if (config('app.debug') || $mailError) {
+            $responsePayload['_dev_otp'] = $otp;
+            if ($mailError) {
+                $responsePayload['_mail_error'] = "Mail delivery failed, using dev OTP fallback: " . $mailError;
+            }
+        }
+
+        return response()->json($responsePayload);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

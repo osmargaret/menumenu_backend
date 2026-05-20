@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('kitchen_logistics', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kitchen_id')->constrained('kitchens')->cascadeOnDelete();
-            $table->string('name');
+            $table->unsignedBigInteger('city_id');
+            $table->string('town');
             $table->integer('fee')->default(500);
             $table->integer('min_delivery_time')->nullable();
             $table->timestamps();

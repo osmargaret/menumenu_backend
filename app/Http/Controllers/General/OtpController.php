@@ -49,6 +49,14 @@ class OtpController extends Controller
         $model->email_verified_at = now();
         $model->save();
 
+        if ($type === 'kitchen') {
+            $user = \App\Models\User::find($model->user_id);
+            if ($user) {
+                $user->email_verified_at = now();
+                $user->save();
+            }
+        }
+
         // Clear OTP from cache
         Cache::forget('otp_' . $model->id);
 
